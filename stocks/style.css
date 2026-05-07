@@ -542,8 +542,10 @@ td {
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(5px);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    overflow-y: auto;
+    padding: 2rem 0;
     z-index: 2000;
     transition: var(--transition);
 }
@@ -555,8 +557,7 @@ td {
     position: relative;
     border: 1px solid var(--glass-border);
     animation: modalSlide 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
+    flex-shrink: 0;
 }
 
 @keyframes modalSlide {
