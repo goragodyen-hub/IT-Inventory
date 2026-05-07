@@ -555,6 +555,8 @@ td {
     position: relative;
     border: 1px solid var(--glass-border);
     animation: modalSlide 0.3s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 @keyframes modalSlide {
