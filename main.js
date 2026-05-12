@@ -576,9 +576,11 @@ async function handleStockUpdate(itemId, amount, drawer, place) {
         const now = new Date();
         const d = String(now.getDate()).padStart(2, '0');
         const m = String(now.getMonth() + 1).padStart(2, '0');
-        const y = now.getFullYear();
-        const time = now.toTimeString().split(' ')[0]; // HH:mm:ss
-        const timestamp = `${d}/${m}/${y} ${time}`;
+        const y = now.getFullYear() + 543; // เปลี่ยนเป็นปี พ.ศ.
+        const h = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        const timestamp = `${d}/${m}/${y} ${h}:${min}:${s}`;
 
         inventory.push({
             'Item ID': itemId,
