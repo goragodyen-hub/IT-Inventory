@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockSupport | Inventory Management</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#050510">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dark-theme">
+    <button class="menu-toggle" id="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i class="fas fa-cubes"></i>
+                <span>IT-Inventory</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</li>
+                <li data-page="inventory"><i class="fas fa-boxes-stacked"></i> Inventory</li>
+                <li data-page="transactions"><i class="fas fa-history"></i> History</li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="dot"></span> Online
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="content">
+            <header class="top-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="global-search" placeholder="Search items, categories...">
+                </div>
+                <div class="user-profile">
+                    <div class="refresh-btn" id="refresh-data">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="user-meta">
+                        <span class="user-name">Administrator</span>
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="User">
+                    </div>
+                </div>
+            </header>
+
+            <div id="page-content" class="page-transition">
+                <!-- Dashboard Content (Default) -->
+                <div id="dashboard-view" class="view">
+                    <h1 class="page-title">Dashboard Overview</h1>
+                    <div class="stats-grid">
+                        <div class="stat-card glass">
+                            <div class="stat-info">
+                                <h3>Total Items</h3>
+                                <p id="total-items-count">--</p>
+                            </div>
+                            <div class="stat-icon purple"><i class="fas fa-tags"></i></div>
+                        </div>
+                        <div class="stat-card glass">
+                            <div class="stat-info">
+                                <h3>Total Stock</h3>
+                                <p id="total-stock-count">--</p>
+                            </div>
+                            <div class="stat-icon blue"><i class="fas fa-warehouse"></i></div>
+                        </div>
+                        <div class="stat-card glass clickable-card" onclick="openLowStockModal()">
+                            <div class="stat-info">
+                                <h3>Low Stock</h3>
+                                <p id="low-stock-count">--</p>
+                            </div>
+                            <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="section glass alerts-section">
+                            <h2>Critical Alerts</h2>
+                            <div id="critical-alerts-list" class="alert-list">
+                                <!-- Dynamic alerts -->
+                            </div>
+                        </div>
+
+                        <div class="section glass borrowers-section">
+                            <h2>Top Borrowers</h2>
+                            <div id="top-borrowers-list" class="borrower-list">
+                                <!-- Dynamic borrowers -->
+                            </div>
+                        </div>
+
+                        <div class="section glass recent-activity">
+                            <h2>Recent Activity</h2>
+                            <ul id="recent-activity-list" class="activity-list">
+                                <!-- Dynamic items -->
+                                <li class="loading">Fetching records...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory View (Hidden by default) -->
+                <div id="inventory-view" class="view hidden">
+                    <div class="header-actions">
+                        <h1 class="page-title">Hardware Inventory</h1>
+                    </div>
+                    <div id="inventory-grid" class="inventory-grid">
+                        <!-- Dynamic items -->
+                    </div>
+                </div>
+
+                <!-- History View (Hidden by default) -->
+                <div id="transactions-view" class="view hidden">
+                    <h1 class="page-title">Transaction History</h1>
+                    <div class="table-container glass">
+                        <table id="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Item</th>
+                                    <th>Amount</th>
+                                    <th>Location</th>
+                                    <th>Person / Drawer</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="overlay">
+        <div class="loader"></div>
+        <p>Syncing with Google Sheets...</p>
+    </div>
+
+    <!-- Item Edit Modal -->
+    <div id="item-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close-btn" id="modal-close">&times;</span>
+            <h2 id="modal-title">Edit Item</h2>
+            <div class="modal-image-container">
+                <img id="modal-item-image" src="" alt="Item">
+            </div>
+            <form id="item-form">
+                <input type="hidden" id="modal-item-id" />
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="modal-item-name" disabled />
+                </div>
+                <div class="form-group">
+                    <label>Current Stock</label>
+                    <input type="number" id="modal-current-stock" disabled />
+                </div>
+                <div class="form-group">
+                    <label>Change Amount</label>
+                    <input type="number" id="modal-amount" placeholder="e.g., 5 or -3" required />
+                </div>
+                <div class="form-group">
+                    <label>Person Name / Drawer</label>
+                    <input type="text" id="modal-drawer" placeholder="Who is making this change?" required />
+                </div>
+                <div class="form-group">
+                    <label>Place / Location</label>
+                    <input type="text" id="modal-place" placeholder="e.g., Storage, Office, IT Room" required />
+                </div>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+
+            <div class="item-specific-history">
+                <h3>Transaction History</h3>
+                <div class="mini-table-container">
+                    <table id="item-history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>By</th>
+                            </tr>
+                        </thead>
+                        <tbody id="item-history-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Borrower History Modal -->
+    <div id="borrower-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close-btn" id="close-borrower-modal">&times;</span>
+            <h2 id="borrower-modal-title">Borrower History</h2>
+            <div class="item-specific-history">
+                <div class="mini-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Item</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody id="borrower-history-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Low Stock Modal -->
+    <div id="low-stock-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <span class="close-btn" id="close-low-stock-modal">&times;</span>
+            <h2>Low Stock Items</h2>
+            <div class="item-specific-history">
+                <div class="mini-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Current Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="low-stock-list-body">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>

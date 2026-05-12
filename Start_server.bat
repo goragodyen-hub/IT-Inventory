@@ -1,0 +1,4 @@
+@echo off
+echo Starting Local Server (PowerShell) with MIME types...
+powershell -ExecutionPolicy Bypass -Command "$p=8000; $w=New-Object Net.HttpListener; $w.Prefixes.Add('http://localhost:'+$p+'/'); $w.Start(); Write-Host 'Server running at http://localhost:8000'; while($w.IsListening){ $c=$w.GetContext(); $r=$c.Response; $path=$c.Request.Url.LocalPath; if($path -eq '/') { $path='/index.html' }; $f=Join-Path $pwd $path.TrimStart('/'); if(Test-Path $f -PathType Leaf){ if($f.EndsWith('.css')){$r.ContentType='text/css'} elseif($f.EndsWith('.js')){$r.ContentType='application/javascript'} elseif($f.EndsWith('.png')){$r.ContentType='image/png'} elseif($f.EndsWith('.jpg')){$r.ContentType='image/jpeg'}; $b=[IO.File]::ReadAllBytes($f); $r.ContentLength64=$b.Length; $r.OutputStream.Write($b,0,$b.Length) } else { $r.StatusCode=404 }; $r.Close() }"
+pause
